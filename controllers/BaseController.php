@@ -40,5 +40,4 @@ class BaseController {
         exit;
     }
 }
-
 ?>

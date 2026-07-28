@@ -1,80 +1,78 @@
-# SIGEF-RAMOS — Guía para OpenCode
+# SIGEF-RAMOS
 
-Idioma: **español**. Sistema de gestión funeraria. PHP + MySQL + Bootstrap 5.
+## Que es este proyecto
 
-## Stack y herramientas
-- PHP 7.4+ nativo (sin framework ni composer)
-- MySQL vía PDO (`config/db.php`)
-- Sin npm, webpack, vite, gulp, docker, ni CI
-- Servidor: XAMPP (Apache + MySQL)
+SIGEF-RAMOS es un sistema de gestion integral para funerarias, construido en PHP 8.3 sin framework, siguiendo el patron MVC. Administra el ciclo completo de un servicio funerario: desde la cotizacion y venta, pasando por el registro de difuntos, hasta la logistica de operaciones (salas, flota, traslados) y la facturacion.
 
-## Setup local (XAMPP)
+**Objetivo de este repositorio**: Evaluar la calidad tecnica de un sistema legacy real. El codigo fuente es intocable — los tests existen para medir, no para corregir.
+
+## Arquitectura
+
+- **Front controller**: `index.php` enruta via query string `?controller=X&action=Y`
+- **4 controladores**: BaseController (render/auth), HomeController (publico), AuthController (login/logout), AdminController (monolitico, 330+ lineas, todas las acciones admin)
+- **11 modelos**: User, Client, Catalog, Quotation, Sale, Payment, Operation, Resource, Role, Sede, Difunto — todos dependen de `global $conn` para acceso PDO
+- **17 tablas MySQL**: schema en `database/sigef_ramos.sql` con datos demo
+- **5 roles**: Administrador, Gerente, Vendedor, Cajero, Operario
+- **Sin**: autoloader PSR-4, namespaces, CSRF, sanitizacion de inputs, inyeccion de dependencias
+
+## Que se hizo (testing)
+
+Se construyo una suite de **25 tests** con Pest v2 (PHPUnit 10.6) para evaluar la calidad del proyecto:
+
+| Capa | Cantidad | Que mide |
+|------|----------|----------|
+| Unit | 10 | Logica de negocio: reglas de negocio en modelos, routing del front controller |
+| Integration | 10 | Modelo + base de datos: CRUD, login, transacciones, filtros |
+| E2E | 5 | HTTP completo: paginas publicas, redirects, manejo de errores sin DB |
+
+### Stack de testing
+- **SQLite in-memory** para unit e integration (schema adaptado en `tests/database/`)
+- **Guzzle** para E2E contra `php -S localhost:9999`
+- **`tests/TestCase.php`** provee helpers: `createTestDatabase()`, `injectGlobalConnection()`, `setUpSession()`, `destroySession()`
+
+### Hallazgos de calidad documentados por los tests
+
+1. `rowCount()` tras SELECT es MySQL-specific — `User::login()` falla en SQLite (`tests/Integration/UserIntegrationTest.php`)
+2. `DATE_ADD(NOW(), INTERVAL 1 DAY)` en Sale model falla fuera de MySQL (`tests/Integration/SaleIntegrationTest.php`)
+3. Errores de conexion se vierten directo al HTML — E2E tests lo confirman
+4. `password_verify()` recibe null en usuarios inactivos (deprecation PHP 8.4)
+5. Todos los modelos dependen de `global $conn` — imposible inyectar dependencias
+6. `config.php` ejecuta `session_start()` en cada request incluyendo bootstrap de tests
+7. Sin proteccion CSRF, sin sanitizacion de POST, sin autoloader
+
+## Comandos
+
 ```bash
-# 1. Clonar dentro de htdocs
-cd C:\xampp\htdocs
-git clone <repo-url> sigef-ramosT
+# Instalar dependencias
+composer install
 
-# 2. Importar BD desde phpMyAdmin o CLI
-mysql -u root < database/sigef_ramos.sql
+# Correr todos los tests
+vendor/bin/pest --no-coverage
 
-# 3. Ajustar BASE_URL en config/config.php si cambia la ruta
-#    define('BASE_URL', 'http://localhost/sigef-ramosT/');
+# Correr por capa
+vendor/bin/pest tests/Unit --no-coverage
+vendor/bin/pest tests/Integration --no-coverage
+vendor/bin/pest tests/E2E --no-coverage
 
-# 4. Abrir en navegador
-http://localhost/sigef-ramosT/
+# Correr un archivo
+vendor/bin/pest tests/Unit/UserTest.php --no-coverage
+
+# E2E: primero levantar servidor
+php -S localhost:9999
+vendor/bin/pest tests/E2E --no-coverage
 ```
 
-## Credenciales por defecto
-Todos los usuarios seed tienen contraseña `123456`. Roles: Administrador, Gerente, Vendedor, Cajero, Operario.
+## Archivos clave
 
-## Arquitectura — MVC casero
-
-### Front Controller (`index.php`)
-Ruteo por query string: `?controller=X&action=Y` → `controllers/XController.php::Y()`.
-Default: `controller=Home&action=index`.
-
-### Controladores
-- `HomeController` — rutas públicas (catalogo, proforma, contacto)
-- `AuthController` — login/logout
-- `AdminController` — todo el panel admin (30+ actions), delega por rol
-
-### Métodos base (`BaseController`)
-```php
-$this->render('ruta/vista', $data, 'admin');     // renderiza con layout
-$this->checkAuth(['Administrador', 'Gerente']);   // redirige a login o 403
-$this->redirect('?controller=Admin&action=...');  // redirect absoluto
 ```
-
-### Modelos
-Patrón fijo: `require_once 'config/config.php'` en la parte superior, `global $conn` en constructor.
-
-### Vistas + layouts
-- `render($view, $data, $layout)` busca `views/$view.php` y lo envuelve en `views/layouts/$layout.php`
-- Layout público: `public.php`. Layout admin con sidebar: `admin.php`
-- Vistas admin organizadas por rol: `views/admin/vendedor/`, `cajero/`, `operario/`, `gerente/`
-
-### Convenciones importantes
-- Los modelos se cargan con `require_once` manual dentro de cada action (no hay autoload)
-- `$_POST['action_type']` discrimina submisiones (ej: `crear_usuario`, `editar_producto`)
-- Roles en BD: Administrador (id=1), Gerente, Vendedor, Cajero, Operario
-- `checkAuth()` sin argumentos solo exige login. Con array, exige uno de esos roles
-
-## Lo que NO existe
-- README.md, .gitignore, composer.json, package.json
-- tests, CI, Docker, build steps
-- ORM, autoloader, dependency injection
-- Migraciones (el SQL es el schema definitivo)
-
-## Archivos de configuración clave
-| Archivo | Qué contiene |
-|---|---|
-| `config/db.php` | credenciales MySQL (`root`/``, `sigef_ramos`) |
-| `config/config.php` | `session_start()`, `BASE_URL`, require de db.php |
-| `database/sigef_ramos.sql` | schema + datos semilla |
-| `assets/img/catalog/` | imágenes subidas desde el admin |
-
-## Convenciones de estilo
-- PHP sin namespaces, todo en global
-- Nombres de tabla en plural español: `usuarios`, `clientes`, `difuntos`, `ventas`
-- IDs auto-incrementales, FK con prefijo `id_`: `id_rol`, `id_sede`, `id_cliente`
-- CSS oscuro/marrón temático funerario en `assets/css/style.css`
+index.php                          # Front controller
+config/config.php                  # Session + BASE_URL + require db
+config/db.php                      # Conexion PDO MySQL
+controllers/BaseController.php     # Render + checkAuth + redirect
+controllers/AdminController.php    # Todas las acciones admin (monolitico)
+models/*.php                       # 11 modelos, todos con global $conn
+database/sigef_ramos.sql           # Schema MySQL + seed data
+tests/TestCase.php                 # Base class para tests
+tests/database/schema.sqlite.sql   # Schema adaptado a SQLite
+tests/database/seed.sqlite.sql     # Datos demo para tests
+```

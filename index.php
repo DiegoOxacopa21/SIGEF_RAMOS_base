@@ -27,9 +27,7 @@ if (file_exists($controllerFile)) {
     }
 }
 else {
-    // Archivo no 
-    
-
+    // Archivo no encontrado
     echo "Error 404: Archivo controlador '$controllerFile' no encontrado";
 }
 ?>

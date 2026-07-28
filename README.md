@@ -1,97 +1,119 @@
-# SIGEF-RAMOS — Sistema de Gestión Funeraria
+# SIGEF-RAMOS
 
-Sistema web para la administración y gestión integral de una funeraria. Desarrollado en **PHP nativo + MySQL** con **Bootstrap 5**.
+Sistema Integral de Gestion de Funerarias — Ramos
 
-## Funcionalidades
-
-- **Catálogo público** — Vista de productos (ataúdes, arreglos florales, urnas) y servicios adicionales
-- **Proforma online** — Simulador de presupuesto para clientes
-- **Panel administrador** — Gestión completa con roles:
-  - **Administrador** — Usuarios, catálogo, y acceso a todos los módulos
-  - **Gerente** — Reportes de ventas, dashboard general
-  - **Vendedor** — Clientes, difuntos, cotizaciones, ventas
-  - **Cajero** — Pagos, comprobantes
-  - **Operario** — Operaciones logísticas, recursos, flota, salas de velación
+Sistema web para la administracion de servicios funerarios. Gestiona cotizaciones, ventas, clientes, difuntos, operaciones logisticas (salas de velacion, flota, traslados), pagos y comprobantes.
 
 ## Requisitos
 
-- [XAMPP](https://www.apachefriends.org/) (Apache + PHP 7.4+ + MySQL)
-- Navegador web moderno
+- PHP 8.3 o superior
+- MySQL 5.7+ o MariaDB 10.3+
+- Composer
+- XAMPP, WAMP o similar (para Apache + MySQL)
 
-## Instalación
+## Instalacion
 
-### 1. Clonar el repositorio
+### 1. Clonar o copiar el proyecto
 
-```bash
-cd C:\xampp\htdocs
-git clone https://github.com/DiegoOxacopa21/SIGEF_RAMOS_base.git sigef-ramosT
-```
+Copiar la carpeta `sigef-ramosT` dentro de `htdocs` (XAMPP) o `www` (WAMP).
 
-### 2. Importar la base de datos
+### 2. Crear la base de datos
 
-Opción A — Desde phpMyAdmin:
-1. Abrir `http://localhost/phpmyadmin`
-2. Crear base de datos `sigef_ramos` (utf8_general_ci)
-3. Importar `database/sigef_ramos.sql`
-
-Opción B — Desde línea de comandos:
-```bash
-mysql -u root < C:\xampp\htdocs\sigef-ramosT\database\sigef_ramos.sql
-```
-
-### 3. Configurar
-
-La configuración por defecto ya apunta a `http://localhost/sigef-ramosT/`. Si cambias la carpeta, editar:
+Abrir phpMyAdmin y ejecutar el script SQL:
 
 ```
-config/config.php  →  define('BASE_URL', 'http://localhost/sigef-ramosT/');
-config/db.php      →  credenciales MySQL (usuario/contraseña)
+database/sigef_ramos.sql
 ```
 
-### 4. Abrir en el navegador
+Esto crea la base de datos `sigef_ramos` con 17 tablas y datos demo.
+
+### 3. Configurar conexion a BD
+
+Editar `config/db.php` si tus credenciales de MySQL son distintas:
+
+```php
+$host = "localhost";
+$db_name = "sigef_ramos";
+$username = "root";
+$password = "";
+```
+
+### 4. Configurar URL base
+
+Editar `config/config.php` — cambiar `BASE_URL` segun tu ruta de instalacion:
+
+```php
+define('BASE_URL', 'http://localhost/sigef-ramosT/');
+```
+
+### 5. Iniciar el servidor
+
+Iniciar Apache y MySQL desde XAMPP. Luego acceder a:
 
 ```
 http://localhost/sigef-ramosT/
 ```
 
-## Usuarios de prueba
+## Usuarios demo
 
-Todos los usuarios tienen contraseña **`123456`**.
+| Email | Password | Rol |
+|-------|----------|-----|
+| admin@ramos.com | 123456 | Administrador |
+| gerente@ramos.com | 123456 | Gerente |
+| vendedor@ramos.com | 123456 | Vendedor |
+| cajero@ramos.com | 123456 | Cajero |
+| operario@ramos.com | 123456 | Operario |
 
-| Correo | Rol |
-|---|---|
-| admin@admin.com | Administrador |
-| gerente@funeraria.com | Gerente |
-| vendedor@funeraria.com | Vendedor |
-| cajero@funeraria.com | Cajero |
-| operario@funeraria.com | Operario |
+Acceso al panel: `?controller=Auth&action=login`
+
+## Instalar tests (opcional)
+
+Los tests evaluan la calidad tecnica del proyecto. No son necesarios para usar el sistema.
+
+```bash
+# Instalar dependencias de testing
+composer install
+
+# Correr los 25 tests
+vendor/bin/pest --no-coverage
+```
+
+Para tests E2E, levantar el servidor PHP integrado en otra terminal:
+
+```bash
+php -S localhost:9999
+vendor/bin/pest tests/E2E --no-coverage
+```
 
 ## Estructura del proyecto
 
 ```
-├── assets/
-│   ├── css/          →  Estilos personalizados
-│   ├── img/catalog/  →  Imágenes de productos
-│   └── js/           →  Scripts (proforma)
-├── config/
-│   ├── config.php    →  Configuración general (BASE_URL, sesión)
-│   └── db.php        →  Conexión MySQL con PDO
-├── controllers/      →  Controladores MVC
-├── database/         →  Script SQL (schema + datos)
-├── models/           →  Modelos MVC
-├── views/
-│   ├── admin/        →  Vistas del panel (por rol)
-│   ├── layouts/      →  Layouts (admin.php, public.php)
-│   └── public/       →  Vistas públicas
-├── index.php         →  Front controller
-├── AGENTS.md         →  Guía para OpenCode/AI
-└── README.md         →  Este archivo
+index.php              Front controller — enruta ?controller=X&action=Y
+config/
+  config.php           Sesion + BASE_URL
+  db.php               Conexion PDO MySQL
+controllers/
+  BaseController.php   Render de vistas + autenticacion
+  HomeController.php   Paginas publicas (inicio, catalogo, proforma, contacto)
+  AuthController.php   Login y logout
+  AdminController.php  Todas las acciones del panel admin
+models/
+  User.php             Usuarios, login, CRUD
+  Client.php           Clientes / deudos
+  Difunto.php          Registro de difuntos
+  Catalog.php          Productos y servicios
+  Quotation.php        Cotizaciones
+  Sale.php             Ventas (directa y desde cotizacion)
+  Payment.php          Pagos y comprobantes
+  Operation.php        Operaciones logisticas
+  Resource.php         Salas, flota, recursos
+  Role.php             Roles del sistema
+  Sede.php             Sedes
+views/
+  layouts/             Plantillas (admin.php, public.php)
+  public/              Paginas publicas
+  admin/               Paneles del admin por rol
+database/
+  sigef_ramos.sql      Schema completo + datos demo
+tests/                 Suite de testing (Pest v2)
 ```
-
-## Tecnologías
-
-- **PHP 7.4+** — Sin framework, MVC casero
-- **MySQL** — Base de datos relacional
-- **Bootstrap 5** — Interfaz responsive
-- **Bootstrap Icons** — Iconografía
-- **PDO** — Conexión segura a base de datos
