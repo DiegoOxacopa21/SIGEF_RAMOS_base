@@ -2,7 +2,7 @@
 
 use Tests\TestCase;
 
-test('login with valid bcrypt password (rowCount behavior varies by DB)', function () {
+test('login with valid credentials should succeed (FAILS: rowCount post-SELECT no portable)', function () {
     $pdo = $this->createTestDatabase();
     $this->injectGlobalConnection($pdo);
 
@@ -20,12 +20,9 @@ test('login with valid bcrypt password (rowCount behavior varies by DB)', functi
 
     $result = $userModel->login('admin@ramos.com', '123456');
 
-    if ($result === false) {
-        expect($row)->not->toBeFalse();
-    } else {
-        expect($_SESSION['user_id'])->toBe(1);
-        expect($_SESSION['user_role_name'])->toBe('Administrador');
-    }
+    expect($result)->toBeTrue('User::login() falla porque rowCount() post-SELECT retorna 0 en SQLite');
+    expect($_SESSION['user_id'])->toBe(1);
+    expect($_SESSION['user_role_name'])->toBe('Administrador');
 
     $this->destroySession();
 });

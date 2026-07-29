@@ -66,6 +66,25 @@ php -S localhost:9999
 vendor/bin/pest tests/E2E --no-coverage
 ```
 
+## Problemas de calidad evidenciados por los tests
+
+Los tests estan diseñados con enfoque **normativo**: definen como deberia funcionar el codigo y **fallan** cuando no cumple el estandar. A continuacion, los problemas detectados que los tests FAIL documentan:
+
+| Test | Resultado | Problema | Evidencia |
+|------|-----------|----------|-----------|
+| `UserIntegration > login with valid credentials` | **FAIL** | `rowCount()` post-SELECT retorna 0 en SQLite, pero login() depende de el para verificar existencia del usuario. Codigo no portable. | `models/User.php:20` — `if ($stmt->rowCount() > 0)` |
+| `SaleIntegration > crearVentaDesdeCotizacion` | **FAIL** | `DATE_ADD(NOW(), INTERVAL 1 DAY)` es sintaxis MySQL exclusiva. Falla en cualquier otro motor de BD. | `models/Sale.php:101,139` — `DATE_ADD(NOW(), INTERVAL 1 DAY)` |
+| `ArchitectureIntegration > global $conn` | **FAIL** | Los 11 modelos usan `global $conn` en su constructor. Imposible inyectar un mock o PDO de testing, el acoplamiento es total. | `models/*.php` — todos tienen `global $conn; $this->conn = $conn;` |
+
+### Problemas adicionales documentados (sin test especifico)
+
+1. **Errores de conexion se vierten al HTML** — `config/db.php:12` usa `echo "Error de conexión: " . $exception->getMessage()`
+2. **`session_start()` en cada request** — `config/config.php:3` ejecuta `session_start()` incluso durante bootstrap de tests
+3. **Sin proteccion CSRF** — Ningun formulario valida tokens, todos los POST son vulnerables
+4. **Sin sanitizacion de inputs** — `$_POST` se pasa directo a los modelos sin filtrado (`AdminController.php:36,83,272`)
+5. **`password_verify()` puede recibir null** — Si un usuario sin password existe en BD, PHP 8.4 lanza deprecation
+6. **Sin autoloader PSR-4** — El proyecto usa `require_once` manual en vez del autoloader de Composer
+
 ## Archivos clave
 
 ```

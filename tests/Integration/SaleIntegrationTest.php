@@ -24,3 +24,20 @@ test('getVentasFiltradas returns correct results with filters', function () {
     $ventas = $saleModel->getVentasFiltradas('', '', '', '');
     expect($ventas)->toHaveCount(4);
 });
+
+test('crearVentaDesdeCotizacion should create sale with operation (FAILS: DATE_ADD MySQL-specific)', function () {
+    $pdo = $this->createTestDatabase();
+    $this->injectGlobalConnection($pdo);
+
+    $pdo->exec("INSERT INTO cotizaciones (id_cliente, subtotal, igv, total, estado) VALUES (1, 1000, 180, 1180, 'pendiente')");
+    $id_cot = $pdo->lastInsertId();
+    $pdo->prepare("INSERT INTO detalle_cotizacion (id_cotizacion, id_producto, descripcion, cantidad, precio_unitario, subtotal) VALUES (?, 1, 'Test', 1, 1000, 1000)")->execute([$id_cot]);
+
+    require_once __DIR__ . '/../../models/Sale.php';
+    $saleModel = new \Sale();
+
+    $result = $saleModel->crearVentaDesdeCotizacion($id_cot, 3);
+
+    expect($result)->not->toBeFalse('crearVentaDesdeCotizacion falla: DATE_ADD(NOW(),INTERVAL 1 DAY) no existe en SQLite');
+    expect($result)->toBeNumeric();
+});
