@@ -22,7 +22,9 @@
         "test": "vendor/bin/pest",
         "test:unit": "vendor/bin/pest tests/Unit",
         "test:integration": "vendor/bin/pest tests/Integration",
-        "test:e2e": "vendor/bin/pest tests/E2E"
+        "test:e2e": "vendor/bin/pest tests/E2E",
+        "test:smoke": "vendor/bin/pest tests/Smoke",
+        "test:regression": "vendor/bin/pest tests/Regression"
     },
     "config": {
         "allow-plugins": {

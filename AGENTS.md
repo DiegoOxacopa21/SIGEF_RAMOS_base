@@ -17,16 +17,18 @@ SIGEF-RAMOS es un sistema de gestion integral para funerarias, construido en PHP
 
 ## Que se hizo (testing)
 
-Se construyo una suite de **25 tests** con Pest v2 (PHPUnit 10.6) para evaluar la calidad del proyecto:
+Se construyo una suite de **tests ampliada (Unit, Integration, E2E, Smoke, Regression)** con Pest v2 (PHPUnit 10.6) para evaluar la calidad del proyecto:
 
-| Capa | Cantidad | Que mide |
+| Capa | Cantidad de archivos | Que mide |
 |------|----------|----------|
-| Unit | 10 | Logica de negocio: reglas de negocio en modelos, routing del front controller |
-| Integration | 10 | Modelo + base de datos: CRUD, login, transacciones, filtros |
-| E2E | 5 | HTTP completo: paginas publicas, redirects, manejo de errores sin DB |
+| Unit | 3 archivos | Logica de negocio: reglas de negocio en modelos, routing del front controller |
+| Integration | 7 archivos | Modelo + base de datos: CRUD, login, transacciones, filtros |
+| E2E | 1 archivo | HTTP completo: paginas publicas, redirects, manejo de errores sin DB |
+| Smoke | 4 archivos | Pruebas de humo: arranque básico, modelos primarios, esquemas y recursos |
+| Regression | 4 archivos | Pruebas de regresión: verificación de bugs conocidos, PDO rowCount, DATE_ADD, RBAC y pagos |
 
 ### Stack de testing
-- **SQLite in-memory** para unit e integration (schema adaptado en `tests/database/`)
+- **SQLite in-memory** para unit, integration, smoke e integration (schema adaptado en `tests/database/`)
 - **Guzzle** para E2E contra `php -S localhost:9999`
 - **`tests/TestCase.php`** provee helpers: `createTestDatabase()`, `injectGlobalConnection()`, `setUpSession()`, `destroySession()`
 
@@ -53,6 +55,8 @@ vendor/bin/pest --no-coverage
 vendor/bin/pest tests/Unit --no-coverage
 vendor/bin/pest tests/Integration --no-coverage
 vendor/bin/pest tests/E2E --no-coverage
+vendor/bin/pest tests/Smoke --no-coverage
+vendor/bin/pest tests/Regression --no-coverage
 
 # Correr un archivo
 vendor/bin/pest tests/Unit/UserTest.php --no-coverage
