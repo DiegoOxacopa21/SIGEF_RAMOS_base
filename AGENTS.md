@@ -17,18 +17,21 @@ SIGEF-RAMOS es un sistema de gestion integral para funerarias, construido en PHP
 
 ## Que se hizo (testing)
 
-Se construyo una suite de **tests ampliada (Unit, Integration, E2E, Smoke, Regression)** con Pest v2 (PHPUnit 10.6) para evaluar la calidad del proyecto:
+Se construyo una suite de **tests ampliada con las 8 capas del modelo (Unit, Integration, E2E, Smoke, Regression, Snapshot, Mutation, Contract)** con Pest v2 (PHPUnit 10.6) para evaluar la calidad del proyecto:
 
 | Capa | Cantidad de archivos | Que mide |
 |------|----------|----------|
 | Unit | 3 archivos | Logica de negocio: reglas de negocio en modelos, routing del front controller |
-| Integration | 7 archivos | Modelo + base de datos: CRUD, login, transacciones, filtros |
+| Integration | 8 archivos | Modelo + base de datos: CRUD, login, transacciones, filtros |
 | E2E | 1 archivo | HTTP completo: paginas publicas, redirects, manejo de errores sin DB |
 | Smoke | 4 archivos | Pruebas de humo: arranque básico, modelos primarios, esquemas y recursos |
 | Regression | 4 archivos | Pruebas de regresión: verificación de bugs conocidos, PDO rowCount, DATE_ADD, RBAC y pagos |
+| Snapshot | 2 archivos | Pruebas de instantánea: estabilidad visual de layouts HTML y estructura de llaves de datos |
+| Mutation | 2 archivos | Pruebas de mutación: comportamiento ante condiciones límite y datos mutados/inválidos |
+| Contract | 2 archivos | Pruebas de contrato: firmas de métodos en controladores, tipos numéricos y llaves obligatorias |
 
 ### Stack de testing
-- **SQLite in-memory** para unit, integration, smoke e integration (schema adaptado en `tests/database/`)
+- **SQLite in-memory** para unit, integration, smoke, regression, snapshot, mutation y contract (schema adaptado en `tests/database/`)
 - **Guzzle** para E2E contra `php -S localhost:9999`
 - **`tests/TestCase.php`** provee helpers: `createTestDatabase()`, `injectGlobalConnection()`, `setUpSession()`, `destroySession()`
 
@@ -44,26 +47,33 @@ Se construyo una suite de **tests ampliada (Unit, Integration, E2E, Smoke, Regre
 
 ## Comandos
 
-```bash
+### PowerShell / CMD (Windows)
+
+```powershell
 # Instalar dependencias
 composer install
 
-# Correr todos los tests
-vendor/bin/pest --no-coverage
+# Correr todos los tests (las 8 capas)
+php vendor/bin/pest --no-coverage
 
-# Correr por capa
-vendor/bin/pest tests/Unit --no-coverage
-vendor/bin/pest tests/Integration --no-coverage
-vendor/bin/pest tests/E2E --no-coverage
-vendor/bin/pest tests/Smoke --no-coverage
-vendor/bin/pest tests/Regression --no-coverage
+# Correr por capa individual (8 capas)
+php vendor/bin/pest tests/Unit --no-coverage
+php vendor/bin/pest tests/Integration --no-coverage
+php vendor/bin/pest tests/E2E --no-coverage
+php vendor/bin/pest tests/Smoke --no-coverage
+php vendor/bin/pest tests/Regression --no-coverage
+php vendor/bin/pest tests/Snapshot --no-coverage
+php vendor/bin/pest tests/Mutation --no-coverage
+php vendor/bin/pest tests/Contract --no-coverage
 
-# Correr un archivo
-vendor/bin/pest tests/Unit/UserTest.php --no-coverage
+# Correr un archivo específico
+php vendor/bin/pest tests/Snapshot/LayoutSnapshotTest.php --no-coverage
+php vendor/bin/pest tests/Mutation/UserMutationTest.php --no-coverage
+php vendor/bin/pest tests/Contract/ApiContractTest.php --no-coverage
 
-# E2E: primero levantar servidor
+# E2E: primero levantar servidor en otra consola
 php -S localhost:9999
-vendor/bin/pest tests/E2E --no-coverage
+php vendor/bin/pest tests/E2E --no-coverage
 ```
 
 ## Problemas de calidad evidenciados por los tests
