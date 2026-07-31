@@ -64,7 +64,7 @@ jobs:
 
       - name: Run all tests with coverage
         if: always()
-        run: php vendor/bin/pest tests/Unit tests/Integration tests/Smoke tests/Snapshot tests/Mutation tests/Contract tests/Regression --coverage --coverage-html=coverage
+        run: php vendor/bin/pest tests/Unit tests/Integration tests/Smoke tests/Snapshot tests/Mutation tests/Contract tests/Regression
 
       - name: Debug coverage driver
         if: always()
