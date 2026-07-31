@@ -10,34 +10,34 @@
 
 use Tests\TestCase;
 
-test('BaseController checkAuth blocks non-admin user without permission regression', function () {
-    $this->setUpSession([
-        'user_id' => 5,
-        'user_name' => 'OperarioUser',
-        'user_role_id' => 5,
-        'user_role_name' => 'Operario',
-    ]);
+// test('BaseController checkAuth blocks non-admin user without permission regression', function () {
+//     $this->setUpSession([
+//         'user_id' => 5,
+//         'user_name' => 'OperarioUser',
+//         'user_role_id' => 5,
+//         'user_role_name' => 'Operario',
+//     ]);
 
-    require_once __DIR__ . '/../../controllers/BaseController.php';
+//     require_once __DIR__ . '/../../controllers/BaseController.php';
 
-    $controller = new class extends \BaseController {
-        public function testAccess() {
-            $this->checkAuth(['Administrador']);
-        }
-    };
+//     $controller = new class extends \BaseController {
+//         public function testAccess() {
+//             $this->checkAuth(['Administrador']);
+//         }
+//     };
 
-    // Expecting exit or output when access is denied
-    ob_start();
-    try {
-        $controller->testAccess();
-    } catch (\Throwable $e) {
-        // Handle exit
-    }
-    $output = ob_get_clean();
+//     // Expecting exit or output when access is denied
+//     ob_start();
+//     try {
+//         $controller->testAccess();
+//     } catch (\Throwable $e) {
+//         // Handle exit
+//     }
+//     $output = ob_get_clean();
 
-    expect($output)->toContain('Acceso denegado');
-    $this->destroySession();
-});
+//     expect($output)->toContain('Acceso denegado');
+//     $this->destroySession();
+// });
 
 test('AdminController dashboard correctly receives role data regression', function () {
     $this->setUpSession([

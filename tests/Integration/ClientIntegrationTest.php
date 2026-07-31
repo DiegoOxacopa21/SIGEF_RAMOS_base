@@ -2,7 +2,7 @@
 
 use Tests\TestCase;
 
-test('addCliente and getClienteById returns correct data', function () {
+test('addCliente y getClienteById retornan los datos correctos', function () {
     $pdo = $this->createTestDatabase();
     $this->injectGlobalConnection($pdo);
 
@@ -30,7 +30,7 @@ test('addCliente and getClienteById returns correct data', function () {
     expect($cliente['apellidos'])->toBe('Garcia');
 });
 
-test('getAllClientes returns all clients ordered by date', function () {
+test('getAllClientes retorna todos los clientes ordenados por fecha', function () {
     $pdo = $this->createTestDatabase();
     $this->injectGlobalConnection($pdo);
 

@@ -3,3 +3,5 @@
 /.phpunit.cache/
 /.pest/
 *.log
+
+/docs/

@@ -2,7 +2,7 @@
 
 use Tests\TestCase;
 
-test('front controller resolves controller class name correctly', function () {
+test('el front controller resuelve correctamente el nombre de la clase del controlador', function () {
     $controllerName = 'Home';
     $controllerClass = ucfirst($controllerName) . 'Controller';
     expect($controllerClass)->toBe('HomeController');
@@ -12,7 +12,7 @@ test('front controller resolves controller class name correctly', function () {
     expect($controllerClass)->toBe('AuthController');
 });
 
-test('controller file path is constructed correctly and exists', function () {
+test('la ruta del archivo del controlador se construye correctamente y existe', function () {
     $controllerName = 'Admin';
     $controllerClass = ucfirst($controllerName) . 'Controller';
     $controllerFile = 'controllers/' . $controllerClass . '.php';

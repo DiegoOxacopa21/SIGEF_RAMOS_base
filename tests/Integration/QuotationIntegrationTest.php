@@ -2,7 +2,7 @@
 
 use Tests\TestCase;
 
-test('crearCotizacion inserts cotizacion and details in database', function () {
+test('crearCotizacion inserta cotización y detalles en la base de datos', function () {
     $pdo = $this->createTestDatabase();
     $this->injectGlobalConnection($pdo);
 

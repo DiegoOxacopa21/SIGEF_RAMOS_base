@@ -2,7 +2,7 @@
 
 use Tests\TestCase;
 
-test('toggleEstado rejects deactivating main admin (id=1)', function () {
+test('toggleEstado rechaza desactivar al administrador principal (id=1)', function () {
     $pdo = $this->createTestDatabase();
     $this->injectGlobalConnection($pdo);
 
@@ -12,7 +12,7 @@ test('toggleEstado rejects deactivating main admin (id=1)', function () {
     $userModel->toggleEstado(1, 'inactivo');
 })->throws(Exception::class, 'No se puede desactivar al Administrador principal.');
 
-test('toggleEstado allows deactivating other users', function () {
+test('toggleEstado permite desactivar otros usuarios', function () {
     $pdo = $this->createTestDatabase();
     $this->injectGlobalConnection($pdo);
 
@@ -27,7 +27,7 @@ test('toggleEstado allows deactivating other users', function () {
     expect($row['estado'])->toBe('inactivo');
 });
 
-test('crearUsuario throws on duplicate email', function () {
+test('crearUsuario lanza excepción con email duplicado', function () {
     $pdo = $this->createTestDatabase();
     $this->injectGlobalConnection($pdo);
 
@@ -43,7 +43,7 @@ test('crearUsuario throws on duplicate email', function () {
     ]);
 })->throws(Exception::class, 'El email ya');
 
-test('crearUsuario succeeds with valid unique data', function () {
+test('crearUsuario tiene éxito con datos únicos válidos', function () {
     $pdo = $this->createTestDatabase();
     $this->injectGlobalConnection($pdo);
 
@@ -67,7 +67,7 @@ test('crearUsuario succeeds with valid unique data', function () {
     expect(password_verify('password123', $user['password']))->toBeTrue();
 });
 
-test('getAllUsers returns all users with roles and sedes', function () {
+test('getAllUsers retorna todos los usuarios con sus roles y sedes', function () {
     $pdo = $this->createTestDatabase();
     $this->injectGlobalConnection($pdo);
 

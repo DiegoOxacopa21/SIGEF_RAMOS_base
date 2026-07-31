@@ -2,7 +2,7 @@
 
 use Tests\TestCase;
 
-test('registrarPago marks venta as pagada and creates comprobante', function () {
+test('registrarPago marca la venta como pagada y crea comprobante', function () {
     $pdo = $this->createTestDatabase();
     $this->injectGlobalConnection($pdo);
 

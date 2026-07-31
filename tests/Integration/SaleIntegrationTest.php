@@ -2,7 +2,7 @@
 
 use Tests\TestCase;
 
-test('getVentasFiltradas returns correct results with filters', function () {
+test('getVentasFiltradas retorna resultados correctos con filtros', function () {
     $pdo = $this->createTestDatabase();
     $this->injectGlobalConnection($pdo);
 
@@ -25,7 +25,7 @@ test('getVentasFiltradas returns correct results with filters', function () {
     expect($ventas)->toHaveCount(4);
 });
 
-test('crearVentaDesdeCotizacion should create sale with operation (FAILS: DATE_ADD MySQL-specific)', function () {
+test('crearVentaDesdeCotizacion debe crear venta con operación (FALLA: DATE_ADD específico de MySQL)', function () {
     $pdo = $this->createTestDatabase();
     $this->injectGlobalConnection($pdo);
 

@@ -2,7 +2,7 @@
 
 use Tests\TestCase;
 
-test('addProducto and getAllProductos includes new product', function () {
+test('addProducto y getAllProductos incluyen el nuevo producto', function () {
     $pdo = $this->createTestDatabase();
     $this->injectGlobalConnection($pdo);
 
@@ -26,7 +26,7 @@ test('addProducto and getAllProductos includes new product', function () {
     expect($nombres)->toContain('Ataud Test');
 });
 
-test('deleteProducto removes product from database', function () {
+test('deleteProducto elimina el producto de la base de datos', function () {
     $pdo = $this->createTestDatabase();
     $this->injectGlobalConnection($pdo);
 

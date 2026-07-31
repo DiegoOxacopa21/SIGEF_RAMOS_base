@@ -2,7 +2,7 @@
 
 use Tests\TestCase;
 
-test('models depend on global $conn preventing dependency injection (FAILS: acoplamiento global)', function () {
+test('los modelos dependen de global $conn evitando la inyección de dependencias (FALLA: acoplamiento global)', function () {
     global $conn;
     $savedConn = $conn;
     $conn = null;
@@ -18,6 +18,6 @@ test('models depend on global $conn preventing dependency injection (FAILS: acop
 
     expect($connValue)->toBeInstanceOf(
         \PDO::class,
-        'Constructor de User usa global $conn en vez de inyeccion de dependencias'
+        'Constructor de User usa global $conn en vez de inyección de dependencias'
     );
 });

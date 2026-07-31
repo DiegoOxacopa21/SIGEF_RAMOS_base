@@ -2,7 +2,7 @@
 
 use Tests\TestCase;
 
-test('login with valid credentials should succeed (FAILS: rowCount post-SELECT no portable)', function () {
+test('el login con credenciales válidas debe tener éxito (FALLA: rowCount post-SELECT no portable)', function () {
     $pdo = $this->createTestDatabase();
     $this->injectGlobalConnection($pdo);
 
@@ -27,7 +27,7 @@ test('login with valid credentials should succeed (FAILS: rowCount post-SELECT n
     $this->destroySession();
 });
 
-test('login with wrong password returns false', function () {
+test('el login con contraseña incorrecta retorna falso', function () {
     $pdo = $this->createTestDatabase();
     $this->injectGlobalConnection($pdo);
 

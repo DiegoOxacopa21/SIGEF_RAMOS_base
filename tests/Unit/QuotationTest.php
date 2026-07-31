@@ -2,7 +2,7 @@
 
 use Tests\TestCase;
 
-test('eliminarCotizacion rejects non-pending quotations', function () {
+test('eliminarCotizacion rechaza cotizaciones que no están pendientes', function () {
     $pdo = $this->createTestDatabase();
     $this->injectGlobalConnection($pdo);
 
@@ -16,7 +16,7 @@ test('eliminarCotizacion rejects non-pending quotations', function () {
     expect($result)->toBeFalse();
 });
 
-test('eliminarCotizacion succeeds for pending quotations and cascades', function () {
+test('eliminarCotizacion tiene éxito en cotizaciones pendientes y elimina en cascada', function () {
     $pdo = $this->createTestDatabase();
     $this->injectGlobalConnection($pdo);
 
@@ -40,7 +40,7 @@ test('eliminarCotizacion succeeds for pending quotations and cascades', function
     expect($stmt->fetchAll())->toHaveLength(0);
 });
 
-test('crearCotizacion rejects empty items', function () {
+test('crearCotizacion rechaza items vacíos', function () {
     $pdo = $this->createTestDatabase();
     $this->injectGlobalConnection($pdo);
 

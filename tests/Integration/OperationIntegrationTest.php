@@ -2,7 +2,7 @@
 
 use Tests\TestCase;
 
-test('updateOperacion assigns sala and flota to operation', function () {
+test('updateOperacion asigna sala y flota a la operación', function () {
     $pdo = $this->createTestDatabase();
     $this->injectGlobalConnection($pdo);
 
