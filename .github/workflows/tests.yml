@@ -64,4 +64,12 @@ jobs:
 
       - name: Coverage summary
         if: always()
-        run: php vendor/bin/pest tests/Unit tests/Integration tests/Smoke tests/Snapshot tests/Mutation tests/Contract tests/Regression/UserLoginRegressionTest.php tests/Regression/SaleDateRegressionTest.php tests/Regression/PaymentComprobanteRegressionTest.php --coverage-text --only-summary-for-coverage-text
+        run: |
+          php -r 'echo "pcov loaded: ", extension_loaded("pcov") ? "SI" : "NO", " | pcov.enabled: ", ini_get("pcov.enabled"), PHP_EOL;'
+          set +e
+          php vendor/bin/pest tests/Unit tests/Integration tests/Smoke tests/Snapshot tests/Mutation tests/Contract tests/Regression/UserLoginRegressionTest.php tests/Regression/SaleDateRegressionTest.php tests/Regression/PaymentComprobanteRegressionTest.php --coverage-text=coverage-report.txt --only-summary-for-coverage-text --coverage-clover=coverage.xml --coverage-php=coverage.cov
+          echo "== exit code: $? =="
+          echo "--- coverage-report.txt ---"
+          cat coverage-report.txt || echo "(no creado)"
+          echo "--- coverage.xml / coverage.cov ---"
+          ls -la coverage.xml coverage.cov || echo "(no creados)"
