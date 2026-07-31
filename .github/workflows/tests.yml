@@ -18,7 +18,7 @@ jobs:
         with:
           php-version: 8.3
           extensions: pdo_sqlite, session
-          coverage: xdebug
+          coverage: pcov
           tools: composer
 
       - name: Install dependencies
@@ -66,9 +66,13 @@ jobs:
         if: always()
         run: php vendor/bin/pest tests/Unit tests/Integration tests/Smoke tests/Snapshot tests/Mutation tests/Contract tests/Regression --coverage --coverage-html=coverage
 
-      - name: Debug coverage directory
+      - name: Debug coverage driver
         if: always()
-        run: ls -la coverage/ || echo "coverage/ NO EXISTE"
+        run: |
+          php -m | grep -iE "pcov|xdebug" || echo "NO HAY DRIVER DE COBERTURA"
+          php -r "echo 'PCOV: ' . (extension_loaded('pcov') ? 'SI' : 'NO') . PHP_EOL;"
+          php -r "echo 'XDEBUG: ' . (extension_loaded('xdebug') ? 'SI' : 'NO') . PHP_EOL;"
+          ls -la coverage/ 2>/dev/null && echo "coverage/ EXISTE" || echo "coverage/ NO EXISTE"
 
       - name: Upload coverage report
         if: always()
