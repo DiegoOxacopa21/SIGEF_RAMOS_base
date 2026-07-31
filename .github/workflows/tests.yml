@@ -1,0 +1,54 @@
+name: Tests
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP 8.3
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.3
+          extensions: pdo_sqlite, session
+          tools: composer
+
+      - name: Install dependencies
+        run: composer install --no-progress --prefer-dist
+
+      - name: Unit tests
+        run: php vendor/bin/pest tests/Unit --no-coverage
+
+      - name: Integration tests
+        run: php vendor/bin/pest tests/Integration --no-coverage
+
+      - name: Smoke tests
+        run: php vendor/bin/pest tests/Smoke --no-coverage
+
+      - name: Snapshot tests
+        run: php vendor/bin/pest tests/Snapshot --no-coverage
+
+      - name: Mutation tests
+        run: php vendor/bin/pest tests/Mutation --no-coverage
+
+      - name: Contract tests
+        run: php vendor/bin/pest tests/Contract --no-coverage
+
+      - name: Regression tests
+        run: |
+          php vendor/bin/pest tests/Regression/UserLoginRegressionTest.php --no-coverage
+          php vendor/bin/pest tests/Regression/SaleDateRegressionTest.php --no-coverage
+          php vendor/bin/pest tests/Regression/PaymentComprobanteRegressionTest.php --no-coverage
+
+      - name: Start server & run E2E tests
+        run: |
+          php -S localhost:9999 &>/dev/null &
+          sleep 2
+          php vendor/bin/pest tests/E2E --no-coverage
