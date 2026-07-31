@@ -60,3 +60,14 @@ jobs:
           php -S localhost:9999 &>/dev/null &
           sleep 2
           php vendor/bin/pest tests/E2E --no-coverage
+
+      - name: Run all tests with coverage
+        if: always()
+        run: php vendor/bin/pest tests/Unit tests/Integration tests/Smoke tests/Snapshot tests/Mutation tests/Contract tests/Regression --coverage-html=coverage --coverage-text
+
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage/
